@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Relatório de Processos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.4;
+            font-size: 12px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .header {
+            width: 100%;
+            text-align: right;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .header .info {
+            flex: 1;
+        }
+
+        .header .info h2 {
+            margin: 0;
+            font-size: 18px;
+            text-transform: capitalize;
+        }
+
+        .header .contact {
+            margin: 3px 0;
+            padding: 0;
+            list-style-type: none;
+            font-size: 12px;
+        }
+
+        .header .contact li {
+            margin: 1px 0;
+        }
+
+        .header .logo {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .header .logo img {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            width: 140px;
+            height: auto;
+            border-radius: 50%;
+            filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
+        }
+
+        .registro-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            padding: 5px 10px;
+            background-color: #f0f0f5;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .registro-indicador {
+            font-size: 14px;
+            font-weight: bold;
+            color: #555;
+            display: flex;
+            align-items: center;
+        }
+
+        .registro-indicador::before {
+            content: "\1F4C3";
+            margin-right: 5px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .processo {
+            margin-bottom: 20px;
+        }
+
+        .main-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+
+        .main-table th,
+        .main-table td {
+            border: 1px solid #ddd;
+            padding: 5px;
+            text-align: left;
+            font-size: 11px;
+            word-wrap: break-word;
+            vertical-align: middle;
+        }
+
+        .main-table td:first-child {
+            width: 30%;
+            white-space: normal;
+        }
+
+        .campo strong {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .processo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .numero-processo {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            float: left;
+        }
+
+        .status {
+            font-size: 12px;
+            padding: 2px 6px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            background-color: #f8f9fa;
+            margin-left: auto;
+            float: right;
+        }
+
+        .marcador-cor {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .main-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin: 10px 0;
+            text-align: center;
+            color: #555;
+        }
+
+        .diligencias-table th,
+        .diligencias-table td,
+        .pedidos-table th,
+        .pedidos-table td,
+        .comentarios-table th,
+        .comentarios-table td,
+        .honorarios-table th,
+        .honorarios-table td,
+        .partes-table th,
+        .partes-table td,
+        .audiencias-table th,
+        .audiencias-table td {
+            border: 1px solid #ddd;
+            padding: 5px;
+            text-align: center;
+            font-size: 11px;
+            word-wrap: break-word;
+            vertical-align: middle;
+        }
+
+        .andamentos-table th:first-child,
+        .andamentos-table td:first-child,
+        .diligencias-table th:first-child,
+        .diligencias-table td:first-child,
+        .pedidos-table th:first-child,
+        .pedidos-table td:first-child,
+        .comentarios-table th:first-child,
+        .comentarios-table td:first-child,
+        .honorarios-table th:first-child,
+        .honorarios-table td:first-child,
+        .partes-table th:first-child,
+        .partes-table td:first-child,
+        .audiencias-table th:first-child,
+        .audiencias-table td:first-child {
+            width: 110px;
+        }
+
+        .andamentos-table td.andamento-text,
+        .diligencias-table td.diligencia-text,
+        .pedidos-table td.pedido-text,
+        .comentarios-table td.comentario-text,
+        .honorarios-table td.honorario-text,
+        .partes-table td.parte-text {
+            text-align: left;
+        }
+
+        .border-bottom {
+            margin-top: 2px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .main-section:last-child {
+            border-bottom: 20px;
+        }
+
+        .andamentos-table th {
+            text-align: center;
+        }
+
+        .andamentos-table td {
+            text-align: center;
+        }
+
+        .comentarios-table th.comentarios-data,
+        .comentarios-table td.comentarios-data {
+            min-width: 100px;
+            width: 120px;
+            text-align: center;
+        }
+
+        .footer-info {
+            font-size: 10px;
+            color: #666;
+        }
+
+        @page {
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-size: 10px;
+                color: #666;
+            }
+
+            @bottom-left {
+                content: 'http://www.ageconsulting.com.br';
+                font-size: 10px;
+                color: #666;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="info">
+            <h2
+                th:text="${relatorio.nomeEmpresa != null && !relatorio.nomeEmpresa.isEmpty() ? relatorio.nomeEmpresa : 'Nome da Empresa Indisponível'}">
+            </h2>
+            <ul class="contact">
+                <li
+                    th:text="${relatorio.enderecoEmpresa != null && !relatorio.enderecoEmpresa.isEmpty() ? relatorio.enderecoEmpresa : 'Endereço não fornecido'}">
+                </li>
+                <li
+                    th:text="${(relatorio.cidadeEmpresa != null && !relatorio.cidadeEmpresa.isEmpty() ? relatorio.cidadeEmpresa : 'Cidade não fornecida') + ' - ' + (relatorio.cepEmpresa != null && !relatorio.cepEmpresa.isEmpty() ? relatorio.cepEmpresa : 'CEP não disponível')}">
+                </li>
+                <li
+                    th:text="${relatorio.emailEmpresa != null && !relatorio.emailEmpresa.isEmpty() ? relatorio.emailEmpresa : 'E-mail não fornecido'}">
+                </li>
+            </ul>
+            <p class="footer-info">
+                Emitido em <span th:text="${relatorio.dataHoraEmissao}"></span> por <span
+                    th:text="${relatorio.usuarioNome} + ' (' + ${relatorio.usuarioEmail} + ')'"></span>
+            </p>
+        </div>
+        <div class="logo">
+            <img class="stroke" src="https://i.imgur.com/rzFG9nJ.png" alt="Logo do Age Consulting" />
+        </div>
+    </div>
+
+    <div th:each="movFat, iter : ${processos}" class="registro">
+        <div class="registro-header">
+            <span class="registro-indicador" th:text="'Registro ' + (${iter.index + 1})"></span>
+        </div>
+
+        <table class="tabela-movfat main-table">
+            <tr>
+                <td colspan="3">
+                    <div class="processo-header">
+                        <div class="numero-processo">
+                            <span th:text="${movFat.razaoSocial ?: 'N/A'}"></span>
+                        </div>
+                        <div class="status">
+                            <strong>Status:</strong>
+                            <span th:text="${movFat.status ?: 'N/A'}"></span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="3">
+                    <strong>Observação:</strong>
+                    <span th:text="${movFat.observacao ?: 'N/A'}"></span>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Dia de Pagamento:</strong> <span th:text="${movFat.diaPg ?: 'N/A'}"></span></td>
+                <td><strong>Contrato:</strong> <span th:text="${movFat.contrato ?: 'N/A'}"></span></td>
+                <td><strong>Tipo:</strong> <span th:text="${movFat.tipo ?: 'N/A'}"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Empresa:</strong> <span th:text="${movFat.empresa ?: 'N/A'}"></span></td>
+                <td><strong>Banco:</strong> <span th:text="${movFat.banco ?: 'N/A'}"></span></td>
+                <td><strong>Cliente:</strong> <span th:text="${movFat.cliente ?: 'N/A'}"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Vencimento:</strong>
+                    <span
+                        th:text="${movFat.vencimento != null ? #temporals.format(movFat.vencimento, 'dd/MM/yyyy') : 'N/A'}"></span>
+                </td>
+                <td><strong>Nota Fiscal:</strong> <span th:text="${movFat.numNF ?: 'N/A'}"></span></td>
+                <td><strong>Número do Título:</strong> <span th:text="${movFat.numTit ?: 'N/A'}"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Mensalidade:</strong>
+                    <span
+                        th:text="'R$ ' + ${movFat.mensalidade != null ? #numbers.formatDecimal(movFat.mensalidade, 2, 2) : '0.00'}"></span>
+                </td>
+                <td><strong>Décimo Terceiro:</strong>
+                    <span
+                        th:text="'R$ ' + ${movFat.decimoTerceiro != null ? #numbers.formatDecimal(movFat.decimoTerceiro, 2, 2) : '0.00'}"></span>
+                </td>
+                <td><strong>Extra:</strong>
+                    <span
+                        th:text="'R$ ' + ${movFat.extra != null ? #numbers.formatDecimal(movFat.extra, 2, 2) : '0.00'}"></span>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Retenção:</strong>
+                    <span
+                        th:text="'R$ ' + ${movFat.retencao != null ? #numbers.formatDecimal(movFat.retencao, 2, 2) : '0.00'}"></span>
+                </td>
+                <td><strong>Data de Pagamento:</strong>
+                    <span
+                        th:text="${movFat.dtPg != null ? #temporals.format(movFat.dtPg, 'dd/MM/yyyy') : 'N/A'}"></span>
+                </td>
+                <td><strong>Valor Pago:</strong>
+                    <span
+                        th:text="'R$ ' + ${movFat.vlPg != null ? #numbers.formatDecimal(movFat.vlPg, 2, 2) : '0.00'}"></span>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Compensação Imposto:</strong> <span th:text="${movFat.compImposto ?: 'N/A'}"></span></td>
+                <td><strong>Comissão:</strong>
+                    <span
+                        th:text="'R$ ' + ${movFat.comissao != null ? #numbers.formatDecimal(movFat.comissao, 2, 2) : '0.00'}"></span>
+                </td>
+                <td><strong>Valor Comissão:</strong>
+                    <span
+                        th:text="'R$ ' + ${movFat.valorComissao != null ? #numbers.formatDecimal(movFat.valorComissao, 2, 2) : '0.00'}"></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+
+</html>
